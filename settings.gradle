@@ -1,0 +1,5 @@
+/** The Clean Architecture */
+rootProject.name = 'helper'
+
+include 'xmlpull-api',
+        'xmlpull-xpp3'

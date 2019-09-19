@@ -1,0 +1,136 @@
+import groovy.json.JsonOutput
+
+// 编译出来的内容
+def artName = getProject().name + '-'+ getProject().version + '.jar'
+
+def jarFile = [getProject().buildDir, 'libs', artName].join('/')
+
+//获取仓库地址
+def repoUrl = "git remote get-url --push origin".execute().text.trim()
+
+// 获取当前的分支
+def branch = "git rev-parse --abbrev-ref HEAD".execute().text.trim()
+
+// 获取当前的提价号
+def commitLong = "git rev-parse HEAD".execute().text.trim()
+def commit = commitLong.substring(0,7)
+
+def commitDateInteger = 'git show -s --format="%ct000"'.execute().text.trim().replace("\"","")
+
+// 发布的项目名
+def deployableArchiveName = "${getProject().name}-${commit}.zip"
+
+// 归档的地址
+def artifactUrl = "${artifactory_url}/${teletraan_deploy_dir}/${deployableArchiveName}"
+
+
+/**
+ *
+ * @param urlString
+ * @param jsonString
+ * @return
+ */
+def post(String urlString, String jsonString) {
+
+    try{
+
+        def url = new URL(urlString)
+        def http = (HttpURLConnection)url.openConnection()
+
+        http.setDoOutput(true)
+        http.setDoInput(true)
+        http.setRequestMethod("POST")
+        http.setRequestProperty("Content-Type", "application/json")
+
+        def writer = new OutputStreamWriter(http.getOutputStream(), "UTF-8")
+        writer.write(jsonString)
+        writer.flush()
+        writer.close()
+
+        http.connect()
+        println http.getResponseMessage()
+    }catch (Exception e){
+        println(e.getMessage())
+    }
+}
+
+/**
+ *
+ * @author evan
+ * create-date 2017/12/13
+ */
+
+def callTeletraanBuilds(String projectName,
+                        String repoUrl,
+                        String branch,
+                        String commitLongString,
+                        Long commitDateMS,
+                        String artifactUrl){
+    try{
+        def buildUrl = getProject().hasProperty("BUILD_URL")?  getProperty("BUILD_URL"):null
+        // 在teletraan build 界面，可以通过连接到代码
+        def scmUrl = String.format("%s/commits/%s",repoUrl,commitLongString)
+        def jsonString = JsonOutput.toJson([
+                name: projectName,
+                repo: repoUrl,
+                branch: branch,
+                commit: commitLongString,
+                commitDate: commitDateMS,
+                commitInfo: scmUrl,
+                artifactUrl: artifactUrl,
+                type: "bitbucket",
+                publishInfo: buildUrl,
+                publishDate: System.currentTimeMillis(),
+        ])
+
+        println("build info :" + jsonString)
+        post(teletraan_builds_url, jsonString)
+    }catch (Exception e){
+        println(e.getMessage())
+    }
+
+}
+
+
+// 打包成可发布的压缩包
+task teletraan(type: Zip){
+    archiveName "${deployableArchiveName}"
+
+
+
+    from("$jarFile") {
+        into('lib')
+    }
+
+    from ("${rootDir}/teletraan" ){
+        include '*'
+        into('teletraan')
+    }
+    def p = File.createTempFile('aaa', 'bbb')
+    p.write "${artName}\n"
+    p.deleteOnExit()
+
+    from (p){
+        rename {
+            "NAME"
+        }
+    }
+
+    destinationDir getProject().buildDir
+}
+
+//teletraan.dependsOn build
+
+// 提交编译信息（build info) 到teletraan 服务
+task teletraanBuildInfo {
+    if(getProject().hasProperty("BUILD_INFO")){
+
+        callTeletraanBuilds(getProject().name,
+                repoUrl,
+                branch,
+                commitLong,
+                Long.valueOf(commitDateInteger),
+                artifactUrl)
+    }
+
+}

@@ -1,0 +1,7 @@
+#!/bin/bash
+# unregister with load-balancer
+# service discovery
+# drain traffic, basically anything needs to be done before shutdown your service.
+
+echo "prestart"
+

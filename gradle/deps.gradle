@@ -1,0 +1,95 @@
+
+ext {
+    library = [
+        baseweb : [
+            dependencies.create("org.springframework.boot:spring-boot-starter:${spring_boot_version}") { force = true },
+            dependencies.create("org.springframework.boot:spring-boot-starter-web:${spring_boot_version}") { force = true },
+            dependencies.create("org.springframework.boot:spring-boot-starter-tomcat:${spring_boot_version}") { force = true },
+        ],
+        genapi : [
+            dependencies.create("org.springframework.boot:spring-boot-starter-web:${spring_boot_version}") { force = true },
+        ],
+
+        springsecurity : [
+            dependencies.create("org.springframework.security:spring-security-web:${spring_security_version}") { force = true },
+            dependencies.create("org.springframework.security:spring-security-crypto:${spring_security_version}") { force = true },
+        ],
+        swagger : [
+//            dependencies.create('io.springfox:springfox-swagger2:2.9.2') { force = true },
+//            dependencies.create('io.springfox:springfox-swagger-ui:2.9.2') { force = true },
+//            dependencies.create('io.springfox:springfox-bean-validators:2.9.2') { force = true },
+        ],
+        thymeleaf :  [
+            dependencies.create("org.springframework.boot:spring-boot-starter-thymeleaf:${spring_boot_version}") { force = true },
+            dependencies.create("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.4.1") { force = true },
+        ],
+
+		jpamysql : [
+            dependencies.create("org.springframework.boot:spring-boot-starter-data-jpa:${spring_boot_version}") { force = true; exclude group:'mysql-connector-java' },
+            dependencies.create("mysql:mysql-connector-java:${mysql_version}") { force = true },
+		],
+        jpapostgres : [
+            dependencies.create("org.springframework.boot:spring-boot-starter-data-jpa:${spring_boot_version}") { force = true; exclude group:'mysql-connector-java' },
+            dependencies.create("org.postgresql:postgresql:42.2.6") { force = true },
+        ],
+        persistence : [
+            dependencies.create("javax.persistence:javax.persistence-api:2.2") { force = true },
+        ],
+        mapstruct: [
+            dependencies.create("org.mapstruct:mapstruct:${mapstruct_version}") { force = true },
+        ],
+        lombok : [
+//            dependencies.create("org.projectlombok:lombok:1.18.8") { force = true },
+        ],
+        jaxb : [
+            dependencies.create("javax.xml.bind:jaxb-api:2.3.1") { force = true },
+//            dependencies.create("javax.activation:activation:1.1") { force = true },
+            dependencies.create("org.glassfish.jaxb:jaxb-runtime:2.3.1") { force = true },
+            dependencies.create("javax.transaction:javax.transaction-api:1.3") { force = true },
+            dependencies.create("org.javassist:javassist:3.23.1-GA") { force = true },
+        ],
+        amqp : [
+            dependencies.create("org.springframework.boot:spring-boot-starter-amqp:${spring_boot_version}") { force = true },
+        ],
+        oauth2 : [
+            dependencies.create("org.springframework.cloud:spring-cloud-starter-oauth2:${spring_cloud}"){ force = true },
+            dependencies.create("org.springframework.cloud:spring-cloud-starter-security:${spring_cloud}"){ force = true },
+            dependencies.create("org.springframework.security:spring-security-jwt:${spring_cloud}"){ force = true },
+        ],
+        markdown : [
+            dependencies.create("com.atlassian.commonmark:commonmark:0.12.1") { force = true },
+            dependencies.create("com.atlassian.commonmark:commonmark-ext-gfm-tables:0.12.1") { force = true },
+            dependencies.create("com.atlassian.commonmark:commonmark-ext-yaml-front-matter:0.12.1") { force = true },
+        ],
+        squirrel : [
+            dependencies.create("org.squirrelframework:squirrel-foundation:0.3.8") {
+                exclude module: 'slf4j-log4j12'
+                exclude module: 'guava'
+                exclude module: 'jsr305'
+                exclude module: 'commons-lang3'
+                exclude module: 'log4j'
+            },
+            dependencies.create("com.google.guava:guava:20.0") {force = true},
+        ],
+        test : [
+            dependencies.create("org.springframework.boot:spring-boot-starter-test:${spring_boot_version}") { 
+                force = true;
+                exclude module:'junit'
+                exclude module:'hamcrest-core'
+                exclude module:'android-json'
+                exclude module:'slf4j-api'
+            },
+//            dependencies.create("junit:junit:4.12") { force = true },
+            dependencies.create("org.junit.jupiter:junit-jupiter-api:5.4.2") { force = true },
+            dependencies.create("org.junit.jupiter:junit-jupiter-params:5.4.2") { force = true },
+            dependencies.create("org.junit.jupiter:junit-jupiter-engine:5.4.2") { force = true },
+            dependencies.create("org.junit.platform:junit-platform-commons:1.4.2") { force = true },
+            dependencies.create("org.junit.platform:junit-platform-engine:1.4.2") { force = true },
+            dependencies.create("org.junit.platform:junit-platform-launcher:1.4.2") { force = true },
+            dependencies.create("org.mockito:mockito-core:2.23.4") { force = true },
+        ],
+        h2 : [
+            dependencies.create("com.h2database:h2:1.4.199") { force = true },
+        ]
+    ]
+}

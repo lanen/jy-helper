@@ -1,0 +1,12 @@
+ext{
+    mainClassName = 'com.buyou.WebStarter'
+}
+
+dependencies {
+
+    implementation "io.codearte.jfairy:jfairy:0.5.9"
+
+    implementation project(":common:adaptors:api:jy-article-api")
+    implementation project(":common:adaptors:genapi:jy-article-api-gen")
+
+}

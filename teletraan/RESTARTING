@@ -1,0 +1,22 @@
+#!/bin/bash
+# Stop IF running
+# Start
+
+if [ -f $TARGET/pid ]; then
+    echo "stop $ENV_NAME , $STAGE_NAME dir: $TARGET"
+    if [ -z "`cat $TARGET/pid`" ]; then
+        kill -9 `cat $TARGET/pid`
+    fi
+fi
+
+JAR_FILE=""
+if [ -f $TARGET/NAME ]; then
+    JAR_FILE=`cat $TARGET/NAME`
+fi
+
+pid=`ps -ef | grep "$JAR_FILE" | grep -v grep | awk '{print $2}'`
+kill -9 $pid
+
+echo "start $ENV_NAME , branch: $BUILD_COMMIT , commit: $BUILD_COMMIT"
+nohup java -jar $TARGET/lib/$JAR_FILE 1>/dev/null 2>&1 &
+echo $! > $TARGET/pid

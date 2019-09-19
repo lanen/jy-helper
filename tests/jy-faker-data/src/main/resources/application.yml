@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/article?characterEncoding=utf8&autoReconnect=true&useSSL=false
+    username: root
+    password: huang
+    driver-class-name: com.mysql.jdbc.Driver
+  liquibase:
+    enabled: false

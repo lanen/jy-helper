@@ -1,0 +1,32 @@
+## 1.4.0
+
+1. add macro-code project
+2. add jenkinsfile support
+3. add jy-config support
+
+
+## 1.3.0 (2019-5-19)
+
+1. deploy support
+2. add jlink support [failed], because of docker alpine musl
+3. add docker support for jy-article-api-spring-boot-app
+
+## 1.2.0 (2019-5-6)
+
+1. rabbit mq support
+2. junit5 support
+3. 使用 ObjectProvider 改造自动注入、
+4. 升级spring-boot, spring-cloud 版本，解决 cglib ReflectUtils jdk11 问题
+5. 增加模块化设计
+6. 修复单用测试无法启动问题
+7. 去掉lombok支持
+8. jy-web-server 去掉 spring-security
+9. add clean architecture support
+
+## 1.1.0  (2019-5-6)
+
+1. h2 support
+2. flyway support
+3. docker support
+4. scripts support
+5. swagger support

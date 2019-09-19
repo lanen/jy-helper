@@ -1,0 +1,164 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url 'https://repo.spring.io/plugins-release/' }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}")
+        // 支持 Artifactory 仓库
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+        // code check
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
+        classpath "gradle.plugin.net.nemerosa:versioning:2.8.2"
+        // jdeps plugin
+        classpath 'org.kordamp.gradle:jdeps-gradle-plugin:0.6.0'
+        classpath 'gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:1.1.2'
+//        classpath 'gradle.plugin.org.gradle.java:experimental-jigsaw:0.1.1'
+        classpath 'org.javamodularity:moduleplugin:1.5.0'
+//        classpath  'net.ltgt.apt' version '0.15'
+    }
+}
+
+apply from : rootProject.file('gradle/deps.gradle')
+
+subprojects{
+    repositories {
+        mavenLocal()
+       
+         maven {
+            url 'https://repo.spring.io/libs-snapshot'
+        }
+
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/groups/public'
+        }
+    }
+
+    apply plugin: 'java-library'
+    apply plugin: 'org.javamodularity.moduleplugin'
+    //apply plugin: 'org.springframework.boot'
+    //apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    // code check
+    apply plugin: 'jacoco'
+    apply plugin: 'net.nemerosa.versioning'
+    apply plugin: 'org.kordamp.gradle.jdeps'
+    apply plugin: 'com.google.cloud.tools.jib'
+    
+
+    sourceCompatibility = 11
+
+    group 'com.buyou.jiayi'
+    version "${jy_common_version}"
+    sourceSets {
+        main.java.srcDirs += "build/generated/sources/annotationProcessor/java/main"
+    }
+
+    dependencies {
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
+    }
+    
+    compileJava {
+        options.encoding = 'UTF-8'
+        options.compilerArgs \
+            << "-Xlint:unchecked" \
+            << "-Xlint:deprecation" \
+            << "--module-version" \
+            << project.version 
+    }
+
+    compileTestJava {
+        options.encoding = 'UTF-8'
+        options.compilerArgs \
+            << "-Xlint:unchecked" \
+            << "-Xlint:deprecation"
+    }
+    
+    test {
+        useJUnitPlatform {
+            includeEngines 'junit-jupiter'
+        }
+
+        moduleOptions {
+            runOnClasspath = true
+        }
+
+        testLogging {
+            events 'PASSED', 'FAILED', 'SKIPPED'
+        }
+    }
+
+   
+    // 定义所有项目的共享变量
+//    ext {
+//        snippetsDir = file('build/generated-snippets')
+//    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
+    artifactoryPublish {
+        dependsOn build
+        publications(publishing.publications.mavenJava)
+    }
+
+    artifactory {
+        publish {
+            contextUrl = "${artifactory_url}"
+            repository {
+                repoKey =  (version.contains('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local')
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+                maven = true
+            }
+
+            defaults {
+                publications('mavenJava')
+            }
+            publishBuildInfo = true
+            publishArtifacts = true
+            publishPom = true
+        }
+
+        resolve {
+            repository {
+                repoKey =  (version.contains('SNAPSHOT') ? 'libs-snapshot' : 'libs-release')
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+                maven = true
+            }
+        }
+    }
+
+    // code check
+    jacoco {
+        toolVersion = '0.8.2'
+    }
+
+    versioning {
+        noWarningOnDirty = true
+    }
+    versionFile {
+        // Path to the file to be written
+        file = new File(project.buildDir.getPath()+'/resources/main/', 'version.properties')
+    }
+
+    processResources.dependsOn(versionFile)
+
+    clean {
+        delete 'out'
+    }
+
+
+}

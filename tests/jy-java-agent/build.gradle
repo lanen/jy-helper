@@ -1,0 +1,20 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+    manifest {
+        attributes (
+                'Premain-Class': 'com.buyou.agent.PreMain'
+        )
+    }
+}
+
+dependencyManagement{
+
+    imports {
+        mavenBom "com.buyou:jiayi-dependencies:1.0.0"
+    }
+}
+
